@@ -69,7 +69,7 @@ async def upsert_external_vacancies(
         )
         existing_ids = set(existing_result.scalars().all())
     else:
-        existing_ids = {}
+        existing_ids = set()
 
     created_count = 0
     for payload in payloads:
@@ -84,6 +84,8 @@ async def upsert_external_vacancies(
         else:
             session.add(Vacancy(**payload))
             created_count += 1
+            if ext_id:
+                existing_ids.add(ext_id)
 
     await session.commit()
     return created_count
